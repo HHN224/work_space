@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Todo 列表{% endblock %}
+
+{% block content %}
+    <h1>📋 我的待办事项</h1>
+
+    {% if todos %}
+        <ul>
+        {% for todo in todos %}
+            <li>{{ todo }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>没有待办事项，去休息吧 🎉</p>
+    {% endif %}
+{% endblock %}

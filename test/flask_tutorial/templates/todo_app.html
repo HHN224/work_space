@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Todo 应用{% endblock %}
+
+{% block content %}
+    <h1>📋 我的待办事项</h1>
+
+    <!-- 添加表单 -->
+    <form method="POST">
+        <input type="text" name="title" placeholder="输入新待办..." required
+               style="width: 70%;">
+        <button type="submit">添加</button>
+    </form>
+
+    <hr>
+
+    <!-- 统计 -->
+    <p>
+        共 {{ todos|length }} 项，
+        已完成 {{ todos|selectattr("done", "eq", True)|list|length }} 项
+    </p>
+
+    <!-- 待办列表 -->
+    {% if todos %}
+        <ul>
+        {% for todo in todos %}
+            <li class="todo-item {% if todo.done %}done{% endif %}">
+                <!-- 切换完成状态 -->
+                <form method="POST" action="{{ url_for('toggle_todo', todo_id=todo.id) }}"
+                      style="display: inline;">
+                    <button type="submit" class="toggle-btn">
+                        {% if todo.done %}✅{% else %}⬜{% endif %}
+                    </button>
+                </form>
+
+                <span>{{ todo.title }}</span>
+
+                <!-- 删除按钮 -->
+                <form method="POST" action="{{ url_for('delete_todo', todo_id=todo.id) }}"
+                      style="display: inline; float: right;">
+                    <button type="submit" class="delete-btn">删除</button>
+                </form>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>还没有待办事项，添加一个吧！</p>
+    {% endif %}
+{% endblock %}

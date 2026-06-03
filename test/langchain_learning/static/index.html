@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 助手</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f5f7fa;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    width: 420px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  h2 { font-size: 18px; color: #333; }
+  .desc { font-size: 13px; color: #888; }
+  .messages {
+    flex: 1;
+    min-height: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 12px;
+    background: #fafbfc;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .msg { padding: 8px 12px; border-radius: 8px; max-width: 85%; word-break: break-word; font-size: 14px; line-height: 1.5; }
+  .msg.user { background: #e1f5fe; align-self: flex-end; }
+  .msg.ai { background: #f3e5f5; align-self: flex-start; }
+  .msg small { display: block; margin-top: 4px; font-size: 11px; color: #999; }
+  input, textarea, button {
+    font-family: inherit; font-size: 14px; padding: 10px 12px;
+    border: 1px solid #ddd; border-radius: 8px; outline: none;
+  }
+  input:focus, textarea:focus { border-color: #7e57c2; }
+  button {
+    background: #7e57c2; color: #fff; border: none; cursor: pointer; font-weight: 500;
+  }
+  button:hover { background: #6a4caf; }
+  button:disabled { background: #ccc; cursor: not-allowed; }
+  .row { display: flex; gap: 8px; }
+  .row input, .row textarea { flex: 1; }
+  .loading { color: #999; font-style: italic; }
+</style>
+</head>
+<body>
+
+<!-- 对话模式 -->
+<div class="card">
+  <h2>💬 对话模式</h2>
+  <p class="desc">支持多轮记忆。AI 会记住你之前说过的话。</p>
+  <div class="messages" id="chatBox"></div>
+  <div class="row">
+    <textarea id="chatInput" rows="2" placeholder="输入消息..."></textarea>
+    <button id="chatBtn" onclick="sendChat()">发送</button>
+  </div>
+</div>
+
+<!-- 简历问答模式 -->
+<div class="card">
+  <h2>📄 简历问答</h2>
+  <p class="desc">基于李明的简历文档回答。你可以问"你做过什么项目""擅长什么技术"等。</p>
+  <div class="messages" id="qaBox"></div>
+  <div class="row">
+    <input id="qaInput" placeholder="输入问题..." onkeydown="if(event.key==='Enter')sendQA()">
+    <button id="qaBtn" onclick="sendQA()">提问</button>
+  </div>
+</div>
+
+<script>
+// 对话模式逻辑
+let sessionId = localStorage.getItem('chat_session_id') || '';
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const btn = document.getElementById('chatBtn');
+  const box = document.getElementById('chatBox');
+  const text = input.value.trim();
+  if (!text) return;
+
+  appendMsg(box, text, 'user');
+  input.value = '';
+  btn.disabled = true;
+
+  try {
+    const body = { message: text };
+    if (sessionId) body.session_id = sessionId;
+
+    const res = await fetch('http://127.0.0.1:5000/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+
+    if (!sessionId && data.session_id) {
+      sessionId = data.session_id;
+      localStorage.setItem('chat_session_id', sessionId);
+    }
+    appendMsg(box, data.reply, 'ai', 'session: ' + sessionId.slice(0,8));
+  } catch (e) {
+    appendMsg(box, '请求失败: ' + e.message, 'ai');
+  }
+  btn.disabled = false;
+  box.scrollTop = box.scrollHeight;
+}
+
+// 简历问答逻辑
+async function sendQA() {
+  const input = document.getElementById('qaInput');
+  const btn = document.getElementById('qaBtn');
+  const box = document.getElementById('qaBox');
+  const text = input.value.trim();
+  if (!text) return;
+
+  appendMsg(box, text, 'user');
+  input.value = '';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('http://127.0.0.1:5000/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: text })
+    });
+    const data = await res.json();
+    appendMsg(box, data.answer, 'ai');
+  } catch (e) {
+    appendMsg(box, '请求失败: ' + e.message, 'ai');
+  }
+  btn.disabled = false;
+  box.scrollTop = box.scrollHeight;
+}
+
+function appendMsg(box, text, cls, meta) {
+  const div = document.createElement('div');
+  div.className = 'msg ' + cls;
+  div.textContent = text;
+  if (meta) {
+    const small = document.createElement('small');
+    small.textContent = meta;
+    div.appendChild(small);
+  }
+  box.appendChild(div);
+}
+</script>
+</body>
+</html>

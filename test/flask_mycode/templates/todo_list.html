@@ -1,0 +1,47 @@
+{% extends "index.html" %}
+
+{% block title %}Todo 应用{% endblock %}
+
+{% block content %}
+<h1>待办清单</h1>
+
+<form method="post" class="form-inline">
+	<input type="text" name="title" placeholder="添加新事项..." required autocomplete="off">
+	<button type="submit">添加</button>
+</form>
+
+{% if todos %}
+<div class="stats">
+	<span class="stat">共 {{ todos|length }} 项</span>
+	<span class="stat done">已完成 {{ todos|selectattr("done", "eq", True)|list|length }} 项</span>
+</div>
+
+<ul class="todo-list">
+	{% for todo in todos %}
+	<li class="todo-item {% if todo.done %}done{% endif %}">
+		<div class="todo-left">
+			<form method="POST" action="{{ url_for('toggle_todo', todo_id=todo.id) }}">
+				<button type="submit" class="toggle-btn" aria-label="切换状态">
+					{% if todo.done %}
+					<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="2"/><path d="M6 10l3 3 5-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					{% else %}
+					<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="2"/></svg>
+					{% endif %}
+				</button>
+			</form>
+			<span class="todo-title">{{ todo.title }}</span>
+		</div>
+
+		<form method="POST" action="{{ url_for('delete_todo', todo_id=todo.id) }}">
+			<button type="submit" class="delete-btn">删除</button>
+		</form>
+	</li>
+	{% endfor %}
+</ul>
+{% else %}
+<div class="empty-state">
+	<p>还没有待办事项，添加一个吧！</p>
+</div>
+{% endif %}
+
+{% endblock %}

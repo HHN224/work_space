@@ -1,0 +1,40 @@
+graph TD
+    START([START]) --> LLM["LLM Node<br/>- Process messages<br/>- Generate response<br/>- Decide tool usage"]
+    
+    LLM --> ROUTER{Tool calls<br/>needed?}
+    
+    ROUTER -->|Yes| TOOL["Tool Node<br/>- Execute tools<br/>- Format results<br/>- Create tool messages"]
+    
+    ROUTER -->|No| END([END])
+    
+    TOOL --> LLM
+    
+    subgraph "State Management"
+        STATE["GraphState<br/>- messages: List[BaseMessage]<br/>- tool_outputs: List[str]"]
+    end
+    
+    subgraph "Available Tools"
+        WEATHER["get_weather(city)<br/>Weather information"]
+        TIME["get_time()<br/>Current timestamp"]
+        STOCK["get_stockprice(ticker)<br/>Stock price data"]
+    end
+    
+    TOOL -.-> WEATHER
+    TOOL -.-> TIME  
+    TOOL -.-> STOCK
+    
+    LLM -.-> STATE
+    TOOL -.-> STATE
+
+    %% Updated color themes
+    classDef startEnd fill:#cce5ff,stroke:#3399ff,color:#003366,font-weight:bold;
+    classDef process fill:#e6ccff,stroke:#9933ff,color:#330066;
+    classDef decision fill:#fff2cc,stroke:#ffcc00,color:#664d00;
+    classDef tools fill:#d0f0c0,stroke:#33cc33,color:#1a3300;
+    classDef state fill:#ffd6d6,stroke:#ff6666,color:#660000,font-style:italic;
+
+    class START,END startEnd
+    class LLM,TOOL process
+    class ROUTER decision
+    class WEATHER,TIME,STOCK tools
+    class STATE state

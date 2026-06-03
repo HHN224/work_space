@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}默认标题{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <a href="/">Todo</a> |
+        <a href="/about">关于</a> |
+        <a href="/todos">待办</a> |
+        <a href="/guestbook">留言板</a>
+    </nav>
+    <hr>
+
+    {% block content %}
+    <!-- 子模板的内容会填到这里 -->
+    {% endblock %}
+
+    <hr>
+    <footer>
+        <small>© 2026 我的 Flask 学习项目</small>
+    </footer>
+</body>
+</html>

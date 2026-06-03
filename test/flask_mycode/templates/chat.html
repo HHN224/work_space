@@ -1,0 +1,42 @@
+{% extends "index.html" %}
+
+{% block title %}留言板{% endblock %}
+
+{% block content %}
+<h1>留言板</h1>
+
+<form method="POST" class="form-card">
+	<div class="form-group">
+		<label>你的名字</label>
+		<input type="text" name="username" placeholder="输入昵称" required>
+	</div>
+	<div class="form-group">
+		<label>留言内容</label>
+		<input type="text" name="message" placeholder="说点什么..." required>
+	</div>
+	<button type="submit">提交留言</button>
+</form>
+
+{% if messages %}
+	<div class="messages-header">
+		<h2>历史留言</h2>
+		<span class="count">{{ messages|length }} 条</span>
+	</div>
+	<div class="messages">
+		{% for message in messages %}
+		<div class="msg">
+			<div class="msg-meta">
+				<strong>{{ message.username }}</strong>
+				<span class="time">刚刚</span>
+			</div>
+			<p>{{ message.message }}</p>
+		</div>
+		{% endfor %}
+	</div>
+{% else %}
+	<div class="empty-state">
+		<p>还没有留言，来第一条吧！</p>
+	</div>
+{% endif %}
+
+{% endblock %}
