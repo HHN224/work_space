@@ -92,7 +92,7 @@ class MinStack(object):
         return self.min[-1]
 
 
-2.二叉树最大深度
+2.二叉树最大深度：
 给定一个二叉树 root ，返回其最大深度。
 二叉树的 最大深度 是指从根节点到最远叶子节点的最长路径上的节点数。
 
@@ -106,15 +106,93 @@ class MinStack(object):
         return max(left_depth, right_depth) + 1
 
 
-3.翻转二叉树
+3.翻转二叉树：
 给你一棵二叉树的根节点 root ，翻转这棵二叉树，并返回其根节点。
 
-    这题其实就比较简单了，因为和上一题是一起做的，所以自己花了点时间没看题解就写出来最优解了，实际上对于二叉树的递归貌似都有些类似的点，都是左边和右边都调用自己这个函数，然后下面一行去实现一些简单的解法即可
+    这题其实就比较简单了，因为和上一题是一起做的，所以自己花了点时间没看题解就写出来最优解了，实际上对于二叉树的递归貌似都有些类似的点，都是左边和右边都调用自己这个函数，然后下面一行去实现一些简单的解法即可;
+    ps:后来又发现了一种迭代的算法，是广度优先的，也贴在下面了，只是变成了用队列来处理，也很简单
 
+    dfs：
         if not root:
             return root
         root.left = self.invertTree(root.left)
         root.right = self.invertTree(root.right)
         root.left, root.right = root.right, root.left
         return root
+
+    bfs:
+        if not root:
+            return root
+        queue = [root]
+        while queue:
+            node = queue.pop(0)
+            node.left, node.right = node.right, node.left
+            if node.left:
+                queue.append(node.left)
+            if node.right:
+                queue.append(node.right)
+        return root
+
+
+4.岛屿数量：
+给你一个由 '1'（陆地）和 '0'（水）组成的的二维网格，请你计算网格中岛屿的数量。
+岛屿总是被水包围，并且每座岛屿只能由水平方向和/或竖直方向上相邻的陆地连接形成。
+此外，你可以假设该网格的四条边均被水包围。
+
+    这题除了数组越界的情况没考虑周全，整体做下来还是比较顺的，但一开始用的递归dps对于我来讲比较好想但是耗时较长，基本在超时边缘了。所以后面去参考了一个迭代dps然后重写了一遍，可能某种程度上更好想（？），毕竟不用递归，也是和上一题差不多，用了模拟栈啊模拟队列一类的东西
+
+
+    递归dps：
+        def widespread(i,j):
+            direct = [[0,1],[0,-1],[1,0],[-1,0]]
+            if i >= x or j >= y or i < 0 or j < 0:
+                return
+            else: 
+                if grid[j][i] == '0':
+                    return
+                grid[j][i] = '0'
+                n = 0
+                while n < 4:
+                    i_move = direct[n][0]
+                    j_move = direct[n][1]
+                    ni, nj = i+i_move, j+j_move
+                    widespread(ni, nj)
+                    n += 1
+            return
+
+        y = len(grid)
+        x = len(grid[0])
+        count = 0
+        for i in range(x):
+            for j in range(y):
+                if grid[j][i] == '1':
+                    count += 1
+                    widespread(i,j)
+        return count
+
+    迭代dps：
+        if not grid or not grid[0]:
+            return 0
+        rows = len(grid)
+        colums = len(grid[0])
+        count = 0
+        dirs = [(1,0),(-1,0),(0,1),(0,-1)]
+        for j in range(rows):
+            for i in range(colums):
+                if grid[j][i] == '1':
+                    stack = [(j,i)]
+                    grid[j][i] = '0'
+                    count += 1
+                    while stack:
+                        r, c = stack.pop()
+                        for dr, dc in dirs:
+                            nr, nc = r+dr, c+dc
+                            if 0 <= nr < rows and 0 <= nc < colums and grid[nr][nc] == '1':
+                                grid[nr][nc] = '0'
+                                stack.append((nr,nc))
+        return count
+
+
+            
+            
         
