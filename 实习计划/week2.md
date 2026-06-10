@@ -104,3 +104,17 @@ class MinStack(object):
         left_depth = self.maxDepth(root.left)
         right_depth = self.maxDepth(root.right)
         return max(left_depth, right_depth) + 1
+
+
+3.翻转二叉树
+给你一棵二叉树的根节点 root ，翻转这棵二叉树，并返回其根节点。
+
+    这题其实就比较简单了，因为和上一题是一起做的，所以自己花了点时间没看题解就写出来最优解了，实际上对于二叉树的递归貌似都有些类似的点，都是左边和右边都调用自己这个函数，然后下面一行去实现一些简单的解法即可
+
+        if not root:
+            return root
+        root.left = self.invertTree(root.left)
+        root.right = self.invertTree(root.right)
+        root.left, root.right = root.right, root.left
+        return root
+        
