@@ -90,3 +90,17 @@ class MinStack(object):
         :rtype: int
         """
         return self.min[-1]
+
+
+2.二叉树最大深度
+给定一个二叉树 root ，返回其最大深度。
+二叉树的 最大深度 是指从根节点到最远叶子节点的最长路径上的节点数。
+
+    这题其实就是递归就好了，但我一开始真的想太多了，一直想要复杂地实现maxDepth的内容，但实际上只需要递归到叶子节点的外面一个，就会发现这个返回了一个空的root，那么空的root就会返回数值0，所以事情就相当简单了
+
+        if not root:
+            return 0
+
+        left_depth = self.maxDepth(root.left)
+        right_depth = self.maxDepth(root.right)
+        return max(left_depth, right_depth) + 1
