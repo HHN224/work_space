@@ -193,6 +193,54 @@ class MinStack(object):
         return count
 
 
+5.腐烂的橘子：
+在给定的 m x n 网格 grid 中，每个单元格可以有以下三个值之一：
+值 0 代表空单元格；
+值 1 代表新鲜橘子；
+值 2 代表腐烂的橘子。
+每分钟，腐烂的橘子 周围 4 个方向上相邻 的新鲜橘子都会腐烂。
+返回 直到单元格中没有新鲜橘子为止所必须经过的最小分钟数。如果不可能，返回 -1 。
+
+    今天有点累，就随便写写了。其实和上一题很像，做这题之前我提前看过题目，稍微想了一下，觉得可以很巧妙地把将要腐烂的位置写上3，然后出循环之后，就可以进下一个循环，把所有的3都变成2，然后在外面mintues++。中间遇到的最大的问题就是层级问题，因为循环有点多，所以写到一半有点乱，而且一开始没有确定下来最外层用while，所以中途不想写了就丢给了ai，得出结论之后恍然大悟，发现退出条件原来这么简单，只需要循环开始前设定好has_rot为false，之后但凡写过一次3，就把has_rot改成true，这样当改3循环结束之后，就可以根据has_rot的值来决定是否要退出。我一开始一直矛盾的点是如果要退出最外层while循环，那么我得再遍历一次去找信息，这里不知道为什么，做的时候一直没绕过来，觉得要找1或者3。但其实1时承载不了退出信息的，因为1有可能是个孤岛。所以只需要表里有至少一个3，我就不退出了，就可以了。
+    ps：心情好点就去研究更快的解法，这个还是有点暴力了
+
+    
+        rows = len(grid)
+        if not rows:
+            return -1
+        colums = len(grid[0])
+        dirs = [(1,0),(-1,0),(0,1),(0,-1)]
+        minutes = 0
+
+        while True:
+            has_rot = False
+            for row in range(rows):
+                for colum in range(colums):
+                    if grid[row][colum] == 2:
+                        for r_move, c_move in dirs:
+                            r, c = row+r_move, colum+c_move
+                            if 0<=r<rows and 0<=c<colums and grid[r][c] == 1:
+                                grid[r][c] = 3
+                                has_rot = True
             
+            if not has_rot:
+                break
+            
+            for row in range(rows):
+                for colum in range(colums):
+                    if grid[row][colum] == 3:
+                        grid[row][colum] = 2
+            
+            minutes += 1
+        
+
+        for row in range(rows):
+            for colum in range(colums):
+                if grid[row][colum] == 1:
+                    return -1
+        
+        return minutes
+            
+
             
         
