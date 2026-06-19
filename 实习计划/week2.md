@@ -242,5 +242,7 @@ class MinStack(object):
         return minutes
             
 
-            
+6.手写简易LRU缓存器：
+    手写LRU cache关键点在于双向链表只关心前后是谁，不关心怎么找；哈希表则负责找，并且保存每个节点的引用。我一开始用链表遍历找key，导致复杂度变成O(n)，后来改为哈希表找key对应的node，复杂度就符合要求的O(1)。
+    代码有点长，我放在附近了，文件名叫LRU_cache.py   
         
