@@ -44,10 +44,9 @@ def squares(n):
 # 两者用法完全相同
 for x in Squares(5): print(x)
 for x in squares(5): print(x)
+```
 
-
-#---------------------------------------------------------------------
-
+```python
 #下面的代码显示了python中list的实现的大概原理，这也是list可以反复迭代的原因
 class SquaresIterable:
     def __init__(self, n):
@@ -72,3 +71,4 @@ class SquaresIterator:
         result = self.i ** 2
         self.i += 1
         return result
+```
